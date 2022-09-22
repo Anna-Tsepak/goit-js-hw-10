@@ -16,8 +16,8 @@ searchInput.addEventListener('input', debounce(getCountryData, DEBOUNCE_DELAY));
 
 function getCountryData(event) {
     const countryName = event.target.value.trim();
-     cleanUpMarkup(countryList);
-     cleanUpMarkup(countryInfo);
+     updatePage(countryList);
+     updatePage(countryInfo);
     if (!countryName) {
         return
     }
@@ -27,7 +27,10 @@ fetchCountries(countryName).then(data => {
         markUpCountry(data[0]);
       }
       if (data.length >= 2 && data.length <= 10) {
-        markUpCountries(data);
+        const markup = markUpCountries(data);
+         updatePage(countryList, markup);
+        console.log (markup)
+
       }
       else if (data.length > 10) {
         Notiflix.Notify.info('Too many matches found. Please enter a more specific name.')
@@ -60,29 +63,27 @@ function markUpCountry(countryData) {
     <div> <span class=boldText>Languages: </span>${languagesEl}</div> `
   );
 }
-
-function markUpCountries(countryData) {
-    countryData.map(country => {
-    const { flags, name } = country;
-    return countryList.insertAdjacentHTML(
-      'beforeend',
-      `<div><img src=${flags.svg} width = "30"/>
-      <span>${name.official}</span></div>`
-    );
-  });
+//   function markUpCountries(countryData) {
+//     countryData.map(country => {
+//     const { flags, name } = country;
+//     return countryList.insertAdjacentHTML(
+//       'beforeend',
+//       `<div><img src=${flags.svg} width = "30"/>
+//       <span>${name.official}</span></div>`
+//     );
+//   });
    
-}
-
-function cleanUpMarkup(element) {
-  element.innerHTML = '';
-}
-
-// function renderCoutry(data) {
-//     const markup = data.map(({ flags, name }) => {
-//         return `<li class="item">
-//         <img src ="${flags.svg}" alt = "${name} width ="30" height = "30" ">
-//                 <p>${name}</p>
-//         </li>`
-//     }).join('');
-    
 // }
+
+function markUpCountries(countryData = []) {
+  return countryData.map(({ flags, name }) => { 
+ return `<div><img src=${flags.svg} width = "30"/>
+      <span>${name.official}</span></div>`
+  }).join(''); 
+}
+
+
+
+function updatePage(element, markup = "") {
+  element.innerHTML = markup;
+}
